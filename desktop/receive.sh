@@ -84,6 +84,7 @@ qpe_string=$(printf '%s' "$qpe_string" | tr -d '\r\n')
 qpe_type="${qpe_string#QPE.1.}"
 qpe_type="${qpe_type%%.*}"
 payload_b64url="${qpe_string#QPE.1.${qpe_type}.}"
+[[ "$payload_b64url" =~ ^[A-Za-z0-9_-]+$ ]] || die "Input contains invalid Base64url data"
 case $(( ${#payload_b64url} % 4 )) in
     0) payload_b64="$payload_b64url" ;;
     2) payload_b64="${payload_b64url}==" ;;
@@ -97,6 +98,9 @@ algorithm=$(printf '%s' "$json" | jq -er '.a | select(type == "string")' 2>/dev/
 if [[ "$qpe_type" == PUB ]]; then
     [[ "$algorithm" == "rsa2048" ]] || die "Unsupported public key algorithm: $algorithm"
     pubkey_b64=$(printf '%s' "$json" | jq -er '.k | select(type == "string" and length > 0)' 2>/dev/null) || die "Public key data is missing"
+    canonical_pubkey_b64=$(printf '%s' "$pubkey_b64" | base64 -d 2>/dev/null | base64 -w 0) || \
+        die "Public key data is not valid Base64"
+    [[ "$canonical_pubkey_b64" == "$pubkey_b64" ]] || die "Public key data is not canonical Base64"
 
     temp_pem=$(mktemp "${TMPDIR:-/tmp}/qpe_pub.XXXXXX")
     trap 'rm -f "$temp_pem"' EXIT
@@ -106,7 +110,10 @@ if [[ "$qpe_type" == PUB ]]; then
         echo
         echo "-----END PUBLIC KEY-----"
     } > "$temp_pem"
-    openssl pkey -pubin -in "$temp_pem" -noout >/dev/null 2>&1 || die "Public key data is not a valid RSA public key"
+    key_description=$(LC_ALL=C openssl rsa -pubin -in "$temp_pem" -text -noout 2>/dev/null) || \
+        die "Public key data is not a valid RSA public key"
+    grep -q '^Public-Key: (2048 bit)$' <<<"$key_description" || \
+        die "Public key must be a 2048-bit RSA key"
 
     if [[ -z "$contact_name" ]]; then
         [[ -r /dev/tty ]] || die "Use --name CONTACT_NAME when importing a public key non-interactively"
@@ -142,6 +149,9 @@ openssl pkey -in "$private_key_path" -noout >/dev/null 2>&1 || die "Private key 
 temp_ciphertext=$(mktemp "${TMPDIR:-/tmp}/qpe_ciphertext.XXXXXX")
 trap 'rm -f "$temp_ciphertext"' EXIT
 printf '%s' "$ct" | base64 -d > "$temp_ciphertext" 2>/dev/null || die "Message contains invalid ciphertext"
+[[ $(base64 -w 0 < "$temp_ciphertext") == "$ct" ]] || die "Message ciphertext is not canonical Base64"
+ciphertext_bytes=$(wc -c < "$temp_ciphertext")
+(( ciphertext_bytes == 256 )) || die "Message ciphertext must be exactly 256 bytes"
 
 openssl pkeyutl -decrypt -inkey "$private_key_path" \
     -in "$temp_ciphertext" \

@@ -123,9 +123,9 @@ bash desktop/send.sh --qr message-for-bob.png Bob
 
 - Never share or delete `private.pem` while you still need to decrypt messages
   sent to the current public key.
-- Desktop keys are regular files, unlike hardware-backed Android Keystore
-  keys. Protect your home directory with appropriate permissions and disk
-  encryption.
+- Desktop keys are regular files rather than keys managed by a mobile
+  operating system's protected keystore or keychain. Protect your home
+  directory with appropriate permissions and disk encryption.
 - RSA-2048 with PKCS#1 padding limits secrets to 245 UTF-8 bytes.
 - Messages are encrypted but not signed; the format does not authenticate the
   sender.

@@ -86,6 +86,7 @@ fi
 [[ "$qpe_pub" == QPE.1.PUB.* ]] || die "Input does not contain a QPE.1.PUB public key"
 
 payload_b64url="${qpe_pub#QPE.1.PUB.}"
+[[ "$payload_b64url" =~ ^[A-Za-z0-9_-]+$ ]] || die "Public key contains invalid Base64url data"
 case $(( ${#payload_b64url} % 4 )) in
     0) payload_b64="$payload_b64url" ;;
     2) payload_b64="${payload_b64url}==" ;;
@@ -97,6 +98,9 @@ json=$(printf '%s' "$payload_b64" | base64 -d 2>/dev/null) || die "Public key co
 algorithm=$(printf '%s' "$json" | jq -er '.a | select(type == "string")' 2>/dev/null) || die "Public key contains invalid JSON"
 [[ "$algorithm" == "rsa2048" ]] || die "Unsupported public key algorithm: $algorithm"
 pubkey_b64=$(printf '%s' "$json" | jq -er '.k | select(type == "string" and length > 0)' 2>/dev/null) || die "Public key data is missing"
+canonical_pubkey_b64=$(printf '%s' "$pubkey_b64" | base64 -d 2>/dev/null | base64 -w 0) || \
+    die "Public key data is not valid Base64"
+[[ "$canonical_pubkey_b64" == "$pubkey_b64" ]] || die "Public key data is not canonical Base64"
 
 printf 'Enter secret: ' >&2
 IFS= read -r -s message </dev/tty || die "Could not read secret"
@@ -116,7 +120,10 @@ trap 'rm -f "$temp_pem"' EXIT
     echo "-----END PUBLIC KEY-----"
 } > "$temp_pem"
 
-openssl pkey -pubin -in "$temp_pem" -noout >/dev/null 2>&1 || die "Public key data is not a valid RSA public key"
+key_description=$(LC_ALL=C openssl rsa -pubin -in "$temp_pem" -text -noout 2>/dev/null) || \
+    die "Public key data is not a valid RSA public key"
+grep -q '^Public-Key: (2048 bit)$' <<<"$key_description" || \
+    die "Public key must be a 2048-bit RSA key"
 
 ct_b64=$(printf '%s' "$message" | openssl pkeyutl -encrypt \
     -pubin -inkey "$temp_pem" \
