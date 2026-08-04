@@ -6,7 +6,7 @@ QR Password Exchanger is a simple utility for securely sharing passwords and oth
 
 Instead of sending passwords in plain text through WhatsApp, Signal, Microsoft Teams, email, or other messaging platforms, users encrypt secrets for a specific recipient before sharing them.
 
-Only the intended recipient can decrypt the message.
+Only the holder of the private key corresponding to the selected public key can decrypt the message.
 
 ---
 
@@ -44,8 +44,8 @@ Scan a QR code with your phone, or use the link below it, to download the latest
 - End-to-end encryption
 - Public/private key cryptography
 - No accounts
-- No servers
-- No cloud storage
+- No project-operated servers
+- No project-operated cloud storage
 - No subscriptions
 - No advertising
 - No tracking
@@ -88,6 +88,14 @@ This makes it possible to exchange encrypted secrets between desktop systems and
 
 ---
 
+# Documentation
+
+- [QPE v1 wire format](docs/protocol/qpe-v1.md) — the implemented public-key and encrypted-message format
+- [Desktop CLI interoperability](docs/protocol/cli-interop.md) — exchange QPE messages with Android and iOS using the included scripts
+- [Security model and limitations](docs/security-model.md) — what the current design protects and what it does not
+
+---
+
 # Project Status
 
 QR Password Exchanger is still an early-stage project.
@@ -96,7 +104,7 @@ The mobile applications are available through the official app stores but are st
 
 The user interface and feature set will continue to evolve.
 
-The versioned QPE message format is intended to remain stable going forward. Future protocol extensions will be introduced through explicit versioning to preserve compatibility whenever practical.
+The versioned QPE message format is intended to remain stable going forward. Future protocol extensions will use explicit envelope versions and/or algorithm identifiers to preserve compatibility whenever practical.
 
 ---
 
@@ -138,6 +146,8 @@ Users remain responsible for protecting:
 - and the physical security of their devices.
 
 Loss of a private key may permanently prevent access to previously received encrypted messages.
+
+For the current cryptographic and application boundaries, see the [security model and limitations](docs/security-model.md).
 
 ---
 

@@ -24,7 +24,7 @@ The recommended workflow is:
 2. Encrypt the secret.
 3. Send the encrypted message through your preferred communication channel.
 
-Only the intended recipient can decrypt it.
+Only the holder of the private key corresponding to the selected public key can decrypt it.
 
 ## Can the developer recover my secrets?
 
