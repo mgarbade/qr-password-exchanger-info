@@ -2,6 +2,8 @@
 
 QR Password Exchanger is a simple utility for securely sharing passwords and other secrets.
 
+![QR Password Exchanger — exchange secrets securely, offline, and end-to-end encrypted](docs/assets/feature-graphic.png)
+
 Instead of sending passwords in plain text through WhatsApp, Signal, Microsoft Teams, email, or other messaging platforms, users encrypt secrets for a specific recipient before sharing them.
 
 Only the intended recipient can decrypt the message.
@@ -10,10 +12,30 @@ Only the intended recipient can decrypt the message.
 
 # Downloads
 
-The latest version is available from the official app stores:
+Scan a QR code with your phone, or use the link below it, to download the latest version from the official app stores.
 
-- **Android (Google Play):** *[Google Play link](https://play.google.com/store/apps/details?id=com.coelnerapps.qrpasswordexchanger&utm_source=emea_Med)*
-- **iPhone & iPad (App Store):** *[App Store link](https://apps.apple.com/de/app/qr-password-exchanger/id6780361762?l=en-GB)*
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://play.google.com/store/apps/details?id=com.coelnerapps.qrpasswordexchanger">
+        <img src="docs/assets/google-play-qr.png" width="220" alt="QR code for QR Password Exchanger on Google Play">
+      </a>
+      <br>
+      <strong>Android</strong>
+      <br>
+      <a href="https://play.google.com/store/apps/details?id=com.coelnerapps.qrpasswordexchanger">Get it on Google Play</a>
+    </td>
+    <td align="center">
+      <a href="https://apps.apple.com/app/qr-password-exchanger/id6780361762">
+        <img src="docs/assets/apple-app-store-qr.png" width="220" alt="QR code for QR Password Exchanger on the Apple App Store">
+      </a>
+      <br>
+      <strong>iPhone &amp; iPad</strong>
+      <br>
+      <a href="https://apps.apple.com/app/qr-password-exchanger/id6780361762">Download on the App Store</a>
+    </td>
+  </tr>
+</table>
 
 ---
 
