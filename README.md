@@ -8,6 +8,13 @@ Instead of sending passwords in plain text through WhatsApp, Signal, Microsoft T
 
 Only the holder of the private key corresponding to the selected public key can decrypt the message.
 
+## See It in Action
+
+▶️ **[Watch the 90-second tutorial on YouTube](https://www.youtube.com/watch?v=O6bGYj3YP6c)**
+
+See how an encrypted password is exchanged between an iPhone and an Android phone using public-key cryptography.
+
+
 ---
 
 # Downloads
