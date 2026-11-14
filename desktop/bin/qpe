@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# qpe — QR Password Exchanger desktop CLI.
+# Dispatches `qpe <command>` to libexec/qpe/qpe-<command>.
+
+set -euo pipefail
+
+die() {
+    echo "qpe: $*" >&2
+    exit 1
+}
+
+usage() {
+    cat <<EOF
+Usage: qpe <command> [options]
+
+Commands:
+  key        Create your identity if needed and print your public key
+  send       Encrypt a secret for a contact or public key
+  receive    Decrypt a message, or save a public key as a contact
+  contacts   List saved contacts
+  help       Show help for a command
+
+Run 'qpe <command> --help' for command options.
+Data directory: \${QPE_HOME:-~/.qr-password-exchanger}
+EOF
+}
+
+# Resolve symlinks so `ln -s .../desktop/bin/qpe ~/.local/bin/qpe` works.
+self=$(readlink -f -- "${BASH_SOURCE[0]}")
+libexec_dir="$(dirname -- "$self")/../libexec/qpe"
+[[ -d "$libexec_dir" ]] || die "Cannot find subcommands in $libexec_dir"
+
+run() {
+    local command="$1"
+    shift
+    [[ "$command" =~ ^[a-z]+$ && -f "$libexec_dir/qpe-$command" ]] || \
+        die "Unknown command: $command (run 'qpe help')"
+    exec bash "$libexec_dir/qpe-$command" "$@"
+}
+
+(( $# > 0 )) || { usage >&2; exit 1; }
+
+command="$1"
+shift
+case "$command" in
+    -h|--help) usage ;;
+    help)
+        if (( $# == 0 )); then
+            usage
+        else
+            run "$1" --help
+        fi
+        ;;
+    *) run "$command" "$@" ;;
+esac

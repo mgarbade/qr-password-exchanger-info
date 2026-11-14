@@ -27,12 +27,18 @@ The fourth segment is Base64url-encoded JSON (RFC 4648 §5, no padding).
 
 ---
 
+## Installation
+
+Run `make install` from the repository root to install the `qpe` command to
+`~/.local/bin` (see [`desktop/README.md`](../../desktop/README.md#install)).
+Without installing, use `desktop/bin/qpe` in place of `qpe` below.
+
 ## My Key
 
 Create a desktop identity and display its copyable public key and inline QR:
 
 ```bash
-bash desktop/my-key.sh
+qpe key
 ```
 
 The command creates a key only when one does not already exist. Files are kept
@@ -41,25 +47,25 @@ under `~/.qr-password-exchanger/`:
 ```
 private.pem   — private RSA key; do not share
 public.pub    — copyable QPE.1.PUB public key
-contacts/     — public keys imported with receive.sh
+contacts/     — public keys imported with `qpe receive`
 ```
 
 Status is written to stderr. The inline QR is displayed only when stdout is a
 terminal, so redirecting stdout writes just the public key:
 
 ```bash
-bash desktop/my-key.sh > my-public-key.txt
+qpe key > my-public-key.txt
 ```
 
 ## Receive
 
-`receive.sh` accepts literal QPE text, a text file, a QR image, or stdin:
+`qpe receive` accepts literal QPE text, a text file, a QR image, or stdin:
 
 ```bash
-bash desktop/receive.sh 'QPE.1.MSG.…'
-bash desktop/receive.sh received.qpe
-bash desktop/receive.sh received.png
-cat received.qpe | bash desktop/receive.sh
+qpe receive 'QPE.1.MSG.…'
+qpe receive received.qpe
+qpe receive received.png
+cat received.qpe | qpe receive
 ```
 
 An encrypted message is decrypted using the desktop identity and the secret is
@@ -67,8 +73,8 @@ printed to stdout. A public key instead prompts for a local contact name and is
 saved under `~/.qr-password-exchanger/contacts/`:
 
 ```bash
-bash desktop/receive.sh 'QPE.1.PUB.…'
-bash desktop/receive.sh --name Alice alice-key.png
+qpe receive 'QPE.1.PUB.…'
+qpe receive --name Alice alice-key.png
 ```
 
 Use `--private-key FILE` to decrypt with a key outside the default identity.
@@ -78,15 +84,15 @@ Use `--private-key FILE` to decrypt with a key outside the default identity.
 Select a saved contact and enter the secret using hidden input:
 
 ```bash
-bash desktop/send.sh
-bash desktop/send.sh Alice
+qpe send
+qpe send Alice
 ```
 
 The recipient can also be a public-key file or literal `QPE.1.PUB.…` text:
 
 ```bash
-bash desktop/send.sh recipient.pub
-bash desktop/send.sh 'QPE.1.PUB.…'
+qpe send recipient.pub
+qpe send 'QPE.1.PUB.…'
 ```
 
 The copyable encrypted `QPE.1.MSG.…` text is printed to stdout. On a terminal,
@@ -94,8 +100,8 @@ an inline QR is also displayed when `qrencode` is installed. Use `--qr` to
 write a PNG instead:
 
 ```bash
-bash desktop/send.sh --qr message.png Alice
-bash desktop/send.sh Alice > message.qpe
+qpe send --qr message.png Alice
+qpe send Alice > message.qpe
 ```
 
 > **Note:** Desktop-generated keys are regular local PEM files rather than keys

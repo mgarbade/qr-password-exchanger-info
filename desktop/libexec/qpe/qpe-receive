@@ -11,7 +11,7 @@ die() {
 
 usage() {
     cat >&2 <<EOF
-Usage: $0 [--name CONTACT_NAME] [--private-key FILE] [TEXT_OR_FILE]
+Usage: qpe receive [--name CONTACT_NAME] [--private-key FILE] [TEXT_OR_FILE]
 
 With no argument, input is read from stdin (or prompted for at a terminal).
 QR image files require zbarimg. Public keys are saved as contacts; encrypted
@@ -143,7 +143,7 @@ fi
 
 [[ "$algorithm" == "rsa2048-pkcs1" ]] || die "Unsupported message algorithm: $algorithm"
 ct=$(printf '%s' "$json" | jq -er '.ct | select(type == "string" and length > 0)' 2>/dev/null) || die "Message ciphertext is missing"
-[[ -f "$private_key_path" && -r "$private_key_path" ]] || die "Private key not found; run desktop/my-key.sh first"
+[[ -f "$private_key_path" && -r "$private_key_path" ]] || die "Private key not found; run 'qpe key' first"
 openssl pkey -in "$private_key_path" -noout >/dev/null 2>&1 || die "Private key file is invalid: $private_key_path"
 
 temp_ciphertext=$(mktemp "${TMPDIR:-/tmp}/qpe_ciphertext.XXXXXX")

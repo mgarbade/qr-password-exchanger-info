@@ -11,7 +11,7 @@ die() {
 
 usage() {
     cat >&2 <<EOF
-Usage: $0 [--qr PNG_FILE] [CONTACT_OR_PUBLIC_KEY]
+Usage: qpe send [--qr PNG_FILE] [CONTACT_OR_PUBLIC_KEY]
 
 CONTACT_OR_PUBLIC_KEY may be a saved contact name, a QPE public-key file, or
 literal QPE.1.PUB text. With no argument, an interactive contact list is shown.
@@ -55,10 +55,10 @@ for command in openssl jq base64; do
 done
 
 if [[ -z "$recipient" ]]; then
-    [[ -d "$contacts_dir" ]] || die "No contacts yet; import a public key with desktop/receive.sh"
+    [[ -d "$contacts_dir" ]] || die "No contacts yet; import a public key with 'qpe receive'"
     shopt -s nullglob
     contact_files=("$contacts_dir"/*.pub)
-    (( ${#contact_files[@]} > 0 )) || die "No contacts yet; import a public key with desktop/receive.sh"
+    (( ${#contact_files[@]} > 0 )) || die "No contacts yet; import a public key with 'qpe receive'"
     echo "Contacts:" >&2
     for i in "${!contact_files[@]}"; do
         contact_file=${contact_files[$i]}

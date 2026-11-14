@@ -93,6 +93,15 @@ This repository already contains a small Linux command-line reference implementa
 
 This makes it possible to exchange encrypted secrets between desktop systems and Android or iOS devices.
 
+```bash
+make install        # installs the `qpe` command to ~/.local/bin
+qpe key             # show your public key (and QR code)
+qpe send Alice      # encrypt a secret for a saved contact
+qpe receive msg.png # decrypt a message or import a public key
+```
+
+See the [desktop quickstart](desktop/README.md) for details.
+
 ---
 
 # Documentation

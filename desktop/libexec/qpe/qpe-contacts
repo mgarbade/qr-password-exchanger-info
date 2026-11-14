@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# List saved contacts, one name per line.
+
+set -euo pipefail
+
+if (( $# > 0 )); then
+    if (( $# == 1 )) && [[ "$1" == -h || "$1" == --help ]]; then
+        echo "Usage: qpe contacts" >&2
+        echo "List saved contacts, one name per line." >&2
+        exit 0
+    fi
+    echo "Error: This command does not accept arguments (use --help for usage)" >&2
+    exit 1
+fi
+
+contacts_dir="${QPE_HOME:-$HOME/.qr-password-exchanger}/contacts"
+
+shopt -s nullglob
+contact_files=("$contacts_dir"/*.pub)
+if (( ${#contact_files[@]} == 0 )); then
+    [[ -t 1 ]] && echo "No contacts yet; import a public key with 'qpe receive'" >&2
+    exit 0
+fi
+
+for contact_file in "${contact_files[@]}"; do
+    contact_name=${contact_file##*/}
+    printf '%s\n' "${contact_name%.pub}"
+done

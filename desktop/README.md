@@ -1,15 +1,13 @@
 # Desktop Quickstart
 
-The desktop tools follow the same workflow as the app: **My Key**, **Receive**,
-and **Send**. They use the compatible `QPE.1.PUB.…` and `QPE.1.MSG.…` text
+The `qpe` command follows the same workflow as the app: **My Key**
+(`qpe key`), **Receive** (`qpe receive`), and **Send** (`qpe send`). They use the compatible `QPE.1.PUB.…` and `QPE.1.MSG.…` text
 formats, so public keys and encrypted messages can be copied directly between
 the terminal and the app.
 
-Run the commands below from the repository root.
-
 ## Requirements
 
-The scripts require Bash, OpenSSL, `jq`, and GNU `base64`.
+`qpe` requires Bash, OpenSSL, `jq`, and GNU `base64`.
 
 Install the optional QR tools to display QR codes and read QR images:
 
@@ -21,19 +19,44 @@ sudo apt install openssl jq coreutils qrencode zbar-tools
 - `qrencode` displays inline QR codes and writes PNG files.
 - `zbarimg` (from `zbar-tools`) reads QR codes from image files.
 
+## Install
+
+From the repository root:
+
+```bash
+make install                         # per user: ~/.local/bin/qpe (no sudo)
+sudo make install PREFIX=/usr/local  # or system-wide
+```
+
+Make sure `~/.local/bin` is on your `PATH`. Bash tab completion for commands
+and contact names is installed too and is picked up by new shells when the
+`bash-completion` package is present.
+
+For development, `make link` symlinks `qpe` to this checkout instead of copying
+it, and `make uninstall` removes either kind of install. Without installing,
+you can also run `desktop/bin/qpe` directly.
+
+```text
+qpe key        Create your identity if needed and print your public key
+qpe send       Encrypt a secret for a contact or public key
+qpe receive    Decrypt a message, or save a public key as a contact
+qpe contacts   List saved contacts
+qpe help CMD   Show options for a command
+```
+
 ## 1. My Key
 
 Create your desktop identity if it does not exist, then print its public key:
 
 ```bash
-bash desktop/my-key.sh
+qpe key
 ```
 
 When `qrencode` is installed, the command also displays an inline QR code that
 can be scanned by the app. To save only the copyable public-key text:
 
 ```bash
-bash desktop/my-key.sh > my-public-key.txt
+qpe key > my-public-key.txt
 ```
 
 The keypair is reused on future runs. It is stored under:
@@ -47,14 +70,14 @@ The keypair is reused on future runs. It is stored under:
 
 ## 2. Receive
 
-`receive.sh` automatically detects encrypted messages and public keys. It can
+`qpe receive` automatically detects encrypted messages and public keys. It can
 read literal text, a text file, a QR image, or standard input:
 
 ```bash
-bash desktop/receive.sh 'QPE.1.MSG.…'
-bash desktop/receive.sh received.txt
-bash desktop/receive.sh received.png
-cat received.txt | bash desktop/receive.sh
+qpe receive 'QPE.1.MSG.…'
+qpe receive received.txt
+qpe receive received.png
+cat received.txt | qpe receive
 ```
 
 For an encrypted message, the decrypted secret is printed to the terminal.
@@ -63,13 +86,13 @@ For a public key, the script asks you to choose a local contact name and saves
 it under `~/.qr-password-exchanger/contacts/`:
 
 ```bash
-bash desktop/receive.sh 'QPE.1.PUB.…'
+qpe receive 'QPE.1.PUB.…'
 ```
 
 You can provide the name directly when importing a file or QR image:
 
 ```bash
-bash desktop/receive.sh --name Alice alice-public-key.png
+qpe receive --name Alice alice-public-key.png
 ```
 
 ## 3. Send
@@ -77,13 +100,13 @@ bash desktop/receive.sh --name Alice alice-public-key.png
 Choose from your saved contacts, then enter the secret using the hidden prompt:
 
 ```bash
-bash desktop/send.sh
+qpe send
 ```
 
 Or select a contact directly:
 
 ```bash
-bash desktop/send.sh Alice
+qpe send Alice
 ```
 
 The copyable `QPE.1.MSG.…` encrypted message is printed to the terminal. When
@@ -92,28 +115,28 @@ The copyable `QPE.1.MSG.…` encrypted message is printed to the terminal. When
 Save the encrypted text or create a PNG QR code:
 
 ```bash
-bash desktop/send.sh Alice > message.txt
-bash desktop/send.sh --qr message.png Alice
+qpe send Alice > message.txt
+qpe send --qr message.png Alice
 ```
 
 You can also send without saving a contact first:
 
 ```bash
-bash desktop/send.sh recipient-public-key.txt
-bash desktop/send.sh 'QPE.1.PUB.…'
+qpe send recipient-public-key.txt
+qpe send 'QPE.1.PUB.…'
 ```
 
 ## Example exchange
 
 ```bash
 # 1. Alice displays her public key; Bob scans it with the app.
-bash desktop/my-key.sh
+qpe key
 
 # 2. Alice imports Bob's public-key QR as a contact.
-bash desktop/receive.sh --name Bob bob-public-key.png
+qpe receive --name Bob bob-public-key.png
 
 # 3. Alice encrypts a secret for Bob and creates a QR image.
-bash desktop/send.sh --qr message-for-bob.png Bob
+qpe send --qr message-for-bob.png Bob
 
 # 4. Alice sends message-for-bob.png to Bob. Only Bob's private key can
 #    decrypt it.
